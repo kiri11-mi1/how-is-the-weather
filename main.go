@@ -32,13 +32,21 @@ func main() {
 		}
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 
-		if !update.Message.IsCommand() {
-            msg.Text = NOT_UNDERSTAND
-        }
+		if update.Message.Location != nil {
+			msg.Text = "Агааа.... Я знаю где ты живёшь!"
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+			bot.Send(msg)
+			continue
+		}
 
 		switch update.Message.Command() {
 			case "start":
 				msg.Text = "Привет. Я пока не готов, но надеюсь скоро меня сделают, а пока посмотри меню команд /help"
+				btn := tgbotapi.KeyboardButton{
+					RequestLocation: true,
+					Text: "Поделитесь вашим местоположением",
+				}
+				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard([]tgbotapi.KeyboardButton{btn})
 			case "today":
 				msg.Text = "Погода сегодня"
 			case "tomorrow":

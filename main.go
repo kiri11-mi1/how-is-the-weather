@@ -1,11 +1,21 @@
 package main
 
 import (
+	"log"
 	"os"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+var HELP = "/tomorrow - Прогноз погоды на завтра\n" +
+			"/today - Прогноз погоды на сегодня\n" +
+			"/week - Прогноз погоды на неделю\n" +
+			"/change_city - Смена города"
+
+var NOT_UNDERSTAND = "Не понел... Введите /help"
+
+
 func main() {
+
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TOKEN"))
 	if err != nil {
 		panic(err)
@@ -20,11 +30,31 @@ func main() {
 		if update.Message == nil {
 			continue
 		}
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-		msg.ReplyToMessageID = update.Message.MessageID
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 
-		if _, err := bot.Send(msg); err != nil {
-			panic(err)
-		}
+		if !update.Message.IsCommand() {
+            msg.Text = NOT_UNDERSTAND
+        }
+
+		switch update.Message.Command() {
+			case "start":
+				msg.Text = "Привет. Я пока не готов, но надеюсь скоро меня сделают, а пока посмотри меню команд /help"
+			case "today":
+				msg.Text = "Погода сегодня"
+			case "tomorrow":
+				msg.Text = "Прогноз на завтра"
+			case "week":
+				msg.Text = "Прогноз на неделю"
+			case "change_city":
+				msg.Text = "Выберете город"
+			case "help":
+				msg.Text = HELP
+			default:
+				msg.Text = NOT_UNDERSTAND
+        }
+
+        if _, err := bot.Send(msg); err != nil {
+            log.Panic(err)
+        }
 	}
 }

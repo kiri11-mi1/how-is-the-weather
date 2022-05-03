@@ -6,7 +6,6 @@ import (
 	"github.com/valyala/fasthttp"
 	"net/http"
 	"os"
-	"strings"
 )
 
 const API = "https://api.openweathermap.org/data/2.5/weather"
@@ -28,13 +27,32 @@ func get_weather_by_coords(longitude float64, latitude float64) (string, error) 
 	}
 	var weather weatherResponse
 	err = json.Unmarshal(response.Body(), &weather)
+
 	if err != nil {
 		fmt.Print(err)
-		return "err", err
+		return "", err
 	}
-	icon := strings.Replace(weather.Weather[0].Icon, "d", "", 1)
-	result := fmt.Sprintf("Погода в городе %s:\n%s %s\nТемпература: %.f\nПо ощущениям: %.f\n", weather.City, emodji[icon], weather.Weather[0].Description, weather.Main.Temp, weather.Main.FeelLikes)
+	emodji := getEmodji(weather.Weather[0].Icon)
+	result := fmt.Sprintf(
+		"Погода в городе %s:\n%s %s\nТемпература: %.f\nПо ощущениям: %.f\n",
+		weather.City, emodji, weather.Weather[0].Description, weather.Main.Temp, weather.Main.FeelLikes)
+
 	return result, nil
+}
+
+func getEmodji(icon string) string {
+	var emodjiMap = map[string]string{
+		"01": "☀️",
+		"02": "⛅️",
+		"03": "☁️",
+		"04": "☁️",
+		"09": "🌧",
+		"10": "🌦",
+		"11": "⛈",
+		"13": "❄️",
+		"50": "🌫",
+	}
+	return emodjiMap[icon[:len(icon)-1]]
 }
 
 type weatherResponse struct {
@@ -47,16 +65,4 @@ type weatherResponse struct {
 		FeelLikes float64 `json:"feels_like"`
 	} `json:"main"`
 	City string `json:"name"`
-}
-
-var emodji = map[string]string{
-	"01": "☀️",
-	"02": "⛅️",
-	"03": "☁️",
-	"04": "☁️",
-	"09": "🌧",
-	"10": "🌦",
-	"11": "⛈",
-	"13": "❄️",
-	"50": "🌫",
 }

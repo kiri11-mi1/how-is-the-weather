@@ -34,7 +34,7 @@ func get_weather_by_coords(longitude float64, latitude float64) (string, error) 
 	}
 	emodji := getEmodji(weather.Weather[0].Icon)
 	result := fmt.Sprintf(
-		"Погода в городе %s:\n%s %s\nТемпература: %.f\nПо ощущениям: %.f\n",
+		"☂️ Погода в городе %s:\n%s %s\n🌡 Температура: %.f °C\n🌡 По ощущениям: %.f °C\n",
 		weather.City, emodji, weather.Weather[0].Description, weather.Main.Temp, weather.Main.FeelLikes)
 
 	return result, nil
